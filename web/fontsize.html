@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fontsize - JS</title>
+</head>
+<body>
+    <select name="size">
+        <option value="16px">16px</option>
+        <option value="5px">5px</option>
+        <option value="30px">30px</option>
+        <option value="50px">50px</option>
+    </select>
+    <p style="font-size: 15px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse purus odio, ultrices a lorem a, accumsan feugiat
+    lacus. Sed at quam metus. Curabitur felis nulla, feugiat sit amet interdum sit amet, fermentum eu lacus. Morbi finibus
+    orci nec mauris consequat cursus. Etiam aliquam mauris tortor, ut efficitur mauris molestie a. Duis id lacinia nisi.
+    Nullam sagittis elit ac posuere finibus. Pellentesque in dui non elit pellentesque egestas. Integer vitae fermentum augue.
+
+    Donec pulvinar vehicula fermentum. Sed vehicula commodo mauris. Nulla justo sem, lacinia eu nisi in, egestas facilisis sem.
+    Maecenas eu malesuada velit. Proin luctus id ligula vitae elementum. Mauris viverra lectus non sagittis volutpat. Quisque
+    vel posuere arcu, in ullamcorper ex. Sed nec consequat nisi, sed luctus est. Integer ultricies enim hendrerit, venenatis
+    magna vitae, dictum est. Sed pharetra a elit nec fermentum. Integer pharetra, ex in semper volutpat, mauris lorem luctus
+    nisi, id maximus massa neque eu sem. Phasellus maximus sem sit amet libero vehicula, eget condimentum mauris dictum. Cras
+    nec sem dui. In hac habitasse platea dictumst. Donec eu rhoncus erat. Maecenas sit amet nunc ut augue luctus faucibus.</p>
+
+    <!--JS-->
+    <script>
+        document.querySelector('select').onchange = function()
+        {
+            document.querySelector('p').style.fontSize = this.value;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JS _ Background</title>
+
+
+</head>
+<body>
+    <button id="red" onclick="make_red();" >R</button>
+    <button id="green" onclick="make_green();">G</button>
+    <button id="blue" onclick="make_blue();">B</button>
+
+    <!--JS-->
+    <script>
+        let body = document.querySelector("body");
+        function make_red()
+        {
+            body.style.backgroundColor = 'red';
+        };
+
+        function make_green()
+        {
+            body.style.backgroundColor = 'green';
+        };
+
+        function make_blue()
+        {
+            body.style.backgroundColor = 'blue';
+        };
+    </script>
+</body>
+</html>

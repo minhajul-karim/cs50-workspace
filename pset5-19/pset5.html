@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>CS50</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="css/scrolling-nav.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="index.html">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="pset5.html">Pset 5</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="pset4.html">Pset 4</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="about.html">About Me</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header -->
+
+    <header class="bg-secondary text-white">
+      <div class="container text-center">
+        <h1>SPELLER</h1>
+        <p class="lead">PSET 5 - 2018</p>
+      </div>
+    </header>
+
+    <!--Content area-->
+
+    <section id="pset5">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <p class="lead">In the Name of Allah, Most Gracious, Most Merciful.</p>
+            <br>
+            <h2>The problem</h2>
+            <p class="lead">You may read the whole specification <a href="https://docs.cs50.net/2019/x/psets/4/speller/trie/speller.html">here</a></p>
+            <p>In a nutshell in this problem we have to load a dictionary into the memory and check the misspellings of another file. Within the default dictionary, mind you, are 143,091 words. We have to check misspellings of several movie scripts(e.g. Lalaland, Birdman) and some other large files. So, there will be another several thousands of words. Loading and checking such a huge number of words take time and precious memory. The challenge ahead of us here is to implement the fastest spell possible! By "fastest," though, we’re talking actual "wall-clock," not asymptotic, time.</p>
+
+            <p>We will use TRIES data structure in this case.</p>
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>Prerequisites</h2>
+            <ul>
+              <li>Basic knowledge about pointers.</li>
+              <li>Basic knowledge about Trie data structure.</li>
+              <li>Knowledge of declaring and modifying custom libraries.</li>
+            </ul>
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>Support</h2>
+            <p>Luckily we do not have to start from the scratch. We will be provided some files such as:</p>
+            <ol>
+              <li><code>speller.c</code>: This is the skeleton of the whole program. The key functions of this file are: <code>load()</code>, <code>check()</code>, <code>unload()</code>, & <code>size()</code>. Unfortunately they do not reside in this file.</li>
+              <li><code>dictionary.c</code>: We have to implement the above-mentioned functions here. To clarify,
+                <ul>
+                  <li><code>load()</code> loads the dictionary into memory.</li>
+                  <li><code>check()</code> checks spellings of a given file.</li>
+                  <li><code>unload()</code> unloads memory.</li>
+                  <li><code>size()</code> calculates the number of loaded words into memory.</li>
+                </ul>
+              </li>
+              <li><code>dictionary.h</code>: This is the custom library which contains the tries structure and prototypes of functions we're going to write.</li>
+            </ol>
+
+            <!-- Walkthrough -->
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>What is a TRIE?</h2>
+
+            <p>Without further ado let’s dive into the mysterious(!really ;) world of tries. To understand tries better, we can watch the following video.</p>
+
+            <!-- Youtube video on tries -->
+            <iframe src="https://www.youtube.com/embed/MC-iQHFdEDI" allowfullscreen></iframe>
+
+            <p class="lead">Now, let's talk about the functions one after another.</p>
+
+            <!-- Load -->
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2 id="valgrind">load()</h2>
+
+            <br>
+
+            <p>The structure of tries looks something like this...</p>
+
+            <!-- Tries structure -->
+            <script src="https://gist.github.com/minhajul-karim/e5f4649304bf115177ac0f7673534c9a.js" ></script>
+
+            <p>The basic idea is we’re going to scan the words/strings of the dictionary file and loop around it. If the character is valid, we load it into memory and if it is the last character, we will set <code>isWord = true;</code></p>
+
+            <p>We know that tries start from a root node. To execute other functions(e.g., <code>unload()</code> and <code>check()</code>) we need a common root which can be used by all functions. As we were instructed not to edit <code>speller.c</code> which contains the main function, we have to create root elsewhere.</p>
+
+            <p>Personally, I created root in <code>dictionary.c</code>. If I had created the root node in <code>load()</code>, I would have to pass it to other functions. I decided to create a GLOBAL root instead.</p>
+
+            <p>The beauty of tries is for every character of a string a new node is created. So, I wrote a separate function called <code>create()</code> for the root node and other child nodes.</p>
+
+            <!--Create function-->
+            <script src="https://gist.github.com/minhajul-karim/788595bbcca8ed914c75a2a4de61bd71.js"></script>
+
+            <p>A piece of advice I want to share to humanity is, <span id="remember">PLEASE, DO NOT FORGET TO CLOSE YOUR FILE.</span></p>
+
+            <!-- Check -->
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>check()</h2>
+
+            <br>
+
+            <p>The beauty of tries is loading and checking information are almost identical. Here we’re going to scan words/strings from any given file and loop around it character after character. </p>
+
+            <p>Suppose “cat” is the word we are looking for. Under root node we have 27 NULL child nodes for alphabet(a-z) and apostrophe(‘).</p>
+
+            <p>Let’s start form the char ‘c’. It is the 3rd character in alphabet and 2nd in our array(e.g., <code>alphabet[2]</code>). If there are any words starting with ‘c’ in dictionary, <code>alphabet[2]</code> of root will not be NULL anymore as another 27 child nodes has been created from ‘c’. We will repeat this process for ‘a’ and ‘t’ as well. If we find <code>isWord == true</code>, after creating a node form ‘t’ which is the last character of 'cat', HURRAY! We have successfully found the word.</p>
+
+            <!-- Size -->
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>size()</h2>
+
+            <br>
+
+            <p>This one is easy. It returns the total number of words loaded into memory.</p>
+
+            <!-- Unload -->
+
+            <br/>
+            <br/>
+            <br/>
+
+            <h2>unload()</h2>
+
+            <br>
+
+            <p>Here our goal is to free each and every block of memory we’ve allocated dynamically. The idea is very simple. We again start form the root, if any indices of <code>root->alphabet[i] != NULL;</code> we get inside of <code>alphabet[i]</code> and make it the new root. We repeat the above process using recursion until we reach a node where all indices of <code>alphabet[]</code> are
+            <code>NULL</code> which means we’re inside of the last child. Now <code>free</code> this node and <code>return</code> to the immediate parent.</p>
+
+            <!--unload function-->
+            <script src="https://gist.github.com/minhajul-karim/2b5e1f0cae4f48b87868c64f04848372.js"></script>
+
+            <br/>
+            <br/>
+
+            <p>Check for any memory leak by executing the following command in bash.</p>
+
+            <!--Valgrind command-->
+            <script src="https://gist.github.com/minhajul-karim/14c1b7d1489395bc52e7f61c99ba0206.js"></script>
+
+            <br/>
+            <br/>
+
+            <p>Do you remember <a href="#valgrind">the advice in all capital at the end of load()?</a></p>
+
+            <p>I was getting continuous memory leaks after executing <code>speller.c</code>. It took me almost a day to find out that I had forgotten to close the file in <code>load()</code>. I should have closed the file right away after the loading process ends. LESSON LEARNT!</p>
+
+            <!--Valgrind image-->
+            <img src="images/valgrind_output.png" class="img-fluid" alt="Responsive image">
+
+            <br/>
+            <br/>
+
+            <p class="lead">If you still got some leaks, keep looking for them. If you receive some messages such as the image above. CONGRATULATION! YOU'VE DONE IT.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; A Journey by CS50 - 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+  </body>
+
+</html>
