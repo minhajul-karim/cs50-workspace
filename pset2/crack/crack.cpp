@@ -27,13 +27,16 @@ int main(int argc, char** argv)
     // String of alphabets
     char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    // Number of characters in letters[]
+    int elements = 52;
+
     // Max length of a password
     int max_password_len = 5;
 
     // Check for password of length 1 to 5(max)
-    for (int i = 1; i <= max_password_len; i++)
+    for (int pwd_len = 1; pwd_len <= max_password_len; pwd_len++)
     {
-        crack(letters, "", argv[1], salt, elements, i);
+        crack(letters, "", argv[1], salt, elements, pwd_len);
     }
 
     printf("not found\n");
