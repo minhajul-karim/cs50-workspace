@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//function prototypes
+// Function prototypes
 
 int base_pos(int arr[], char c);
 
@@ -23,10 +23,10 @@ int main(int argc, string argv[])
     int i, j, length;
     char key[100];
 
-    //creating alphabetic indices of capital and small letters
+    // Create alphabetical indices of capital and small letters
     create_alphabetical_indices(capital_array, small_array);
 
-    //Check the argument count
+    // Check the argument count
     if (argc != 2)
     {
         printf("Error\n");
@@ -34,13 +34,13 @@ int main(int argc, string argv[])
     }
     else
     {
-        // copyting argv[1] to string key
+        // Copy argv[1] to string key
         strcpy(key, argv[1]);
 
         //The length of key
         int key_len = strlen(key);
 
-        //checking if key has any non-alphabetical character
+        // Check if key has any non-alphabetical character
         for (i = 0; i < key_len; i++)
         {
             if (!isalpha(key[i]))
@@ -50,20 +50,13 @@ int main(int argc, string argv[])
             }
         }
 
-        //turning key into alphabetical indices
+        // Turn a key into an alphabetical index
         string_to_int(key, key_int, capital_array, small_array);
 
-        //print key_int
-        /*for (i = 0; i < key_len; i++)
-        {
-            printf("%d ", key_int[i]);
-        }
-        printf("\n");*/
-
-        //prompting for plaintext
+        // Promt for plaintext
         plain_text = get_string("plaintext: ");
 
-        //Calculate the length of plaintext
+        // Calculate the length of plaintext
         length = strlen(plain_text);
 
         //Encipher
@@ -73,7 +66,7 @@ int main(int argc, string argv[])
     return 0;
 }
 
-//Calculates the index of a letter in alphabetical indices
+// Calculates the index of a letter in alphabetical indices
 int base_pos(int arr[], char c)
 {
     int i, base_position = 0;
@@ -90,7 +83,7 @@ int base_pos(int arr[], char c)
 
 
 
-//calculates the the index of encrypted letter
+// Calculates the the index of encrypted letter
 int encipher_calculation(int base, int k)
 {
     int index = (base + k) % 26;
@@ -98,7 +91,7 @@ int encipher_calculation(int base, int k)
 }
 
 
-//Checks each letter of plaintext and prints with encryption if applicable
+// Checks each letter of plaintext and prints with encryption if applicable
 void encipher(string original_text, int cap_arr[], int sm_arr[], int len, int key_int[], int key_len)
 {
     int i, j = 0, x, encrypted_index = 0;
@@ -132,12 +125,12 @@ void encipher(string original_text, int cap_arr[], int sm_arr[], int len, int ke
 }
 
 
-//Creates alphabetical indices for both capital and small letters
+// Creates alphabetical indices for both capital and small letters
 void create_alphabetical_indices(int cap_arr[], int sm_arr[])
 {
     int i, letter_cap = 65, letter_sm = 97;
 
-    //filling sm_arr with cap letters
+    // Fill cap_arr with cap letters
     for (i = 0; ; i++)
     {
         if (letter_cap > 90)
@@ -151,8 +144,7 @@ void create_alphabetical_indices(int cap_arr[], int sm_arr[])
         }
     }
 
-    //filling sm_arr with small letters
-
+    // Fill sm_arr with small letters
     for (i = 0; ; i++)
     {
         if (letter_sm > 122)

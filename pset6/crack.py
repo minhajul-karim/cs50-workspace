@@ -1,6 +1,7 @@
 import sys
 import crypt
 
+
 def main():
     # Check for appropriate input
     if (len(sys.argv) != 2):
@@ -14,10 +15,10 @@ def main():
     letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     # Number of characters in letters[]
-    elements = len(letters);
+    elements = len(letters)
 
     # Max length of a password
-    max_password_len = 5;
+    max_password_len = 5
 
     for pwd_len in range(1, max_password_len + 1):
         crack(letters, "", sys.argv[1], salt, elements, pwd_len)
@@ -35,10 +36,10 @@ def crack(alpha, prefix, arg, salt, n, k):
 
         return
 
-    # Create every possible combination of alphabets of given length i.e. k
     for i in range(n):
         newPrefix = prefix + alpha[i]
         crack(alpha, newPrefix, arg, salt, n, k - 1)
+
 
 # Run the main function
 if __name__ == "__main__":
