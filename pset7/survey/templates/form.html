@@ -3,12 +3,49 @@
 {% block main %}
 
     <!-- http://getbootstrap.com/docs/4.1/content/typography/ -->
-    <h1 class="mb-3">Form</h1>
+    <h1 class="mb-3">Be a Donor!</h1>
 
     <!-- http://getbootstrap.com/docs/4.1/components/forms/ -->
     <form action="/form" method="post">
 
-        <!-- TODO -->
+        <!-- Name -->
+        <input type="text" class="form-control" placeholder="Name">
+        
+        <!-- Blood Group -->
+        <select class="custom-select">
+          <option selected disabled>Blood Group</option>
+          <option value="a+">A(+ve)</option>
+          <option value="a-">A(-ve)</option>
+          <option value="b+">B(+ve)</option>
+          <option value="b-">B(-ve)</option>
+          <option value="o+">O(+ve)</option>
+          <option value="o-">O(-ve)</option>
+          <option value="ab+">AB(+ve)</option>
+          <option value="ab-">AB(-ve)</option>
+        </select>
+
+        <!-- Sex -->
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="sex" id="rad1" value="male" checked>
+          <label class="form-check-label" for="rad1">
+            Male
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="sex" id="rad2" value="female">
+          <label class="form-check-label" for="rad2">
+            Female
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="sex" id="rad3" value="others">
+          <label class="form-check-label" for="rad3">
+            Others
+          </label>
+        </div>
+
+        <!-- Contact Number -->
+        <input type="text" class="form-control" placeholder="Contact Number">
 
         <!-- http://getbootstrap.com/docs/4.1/components/buttons/ -->
         <button class="btn btn-primary" type="submit">Submit</button>
