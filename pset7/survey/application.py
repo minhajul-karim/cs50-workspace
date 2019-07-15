@@ -31,11 +31,26 @@ def get_form():
 
 @app.route("/form", methods=["POST"])
 def post_form():
-    # Check if any amongst input fields were empty
-    if not request.form.get("name") or not request.form.get("group") or not request.form.get("gender") or not request.form.get("phone"):
+
+    # Information posted by form
+    name = request.form.get("name")
+    group = request.form.get("group")
+    gender = request.form.get("gender")
+    phone = request.form.get("phone")
+
+    # Input validation for form inputs
+    if not name or not group or not gender or not phone:
         return render_template("error.html", message="Please provide all required information")
-    else:
-        return render_template("error.html", message="Thank You!")
+    
+    # Save from info into csv file
+    with open('survey.csv', 'a', newline='') as csvfile:
+        fieldnames = ['user_name', 'blood_group', 'user_gender', 'user_phone']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        #writer.writeheader()
+        writer.writerow({'user_name': name, 'blood_group': group, 'user_gender': gender, 'user_phone': phone})
+
+    return render_template("success.html")
 
 
 @app.route("/sheet", methods=["GET"])
