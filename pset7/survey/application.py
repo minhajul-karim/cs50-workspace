@@ -31,7 +31,11 @@ def get_form():
 
 @app.route("/form", methods=["POST"])
 def post_form():
-    return render_template("error.html", message="TODO")
+    # Check if any amongst input fields were empty
+    if not request.form.get("name") or not request.form.get("group") or not request.form.get("gender") or not request.form.get("phone"):
+        return render_template("error.html", message="Please provide all required information")
+    else:
+        return render_template("error.html", message="Thank You!")
 
 
 @app.route("/sheet", methods=["GET"])
