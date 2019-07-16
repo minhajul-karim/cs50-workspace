@@ -33,7 +33,7 @@ def get_form():
 @app.route("/form", methods=["POST"])
 def post_form():
 
-    # Information posted by form
+    # Information gathered from the form
     name = request.form.get("name")
     group = request.form.get("group")
     gender = request.form.get("gender")
@@ -46,15 +46,19 @@ def post_form():
     # Check if the file already exists
     file_exists = os.path.isfile('survey.csv')
     
-    # Save from info into csv file
+    # Save FORM info into csv file
     with open('survey.csv', 'a', newline='') as csvfile:
+        # Column headers
         fieldnames = ['Name', 'Blood Group', 'Gender', 'Phone']
+
+        # Gather data from csv file to write
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        # Write header if the file doesn't exist
+        # Write header if the file is being created for the 1st time
         if not file_exists:
             writer.writeheader()
 
+        # Write rows into csv file
         writer.writerow({'Name': name, 'Blood Group': group, 'Gender': gender, 'Phone': phone})
 
     # Redirect to sheet route
@@ -63,7 +67,11 @@ def post_form():
 
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
+    # Open csv file to read
     with open('survey.csv', newline='') as csvfile:
+        # Gather data from csv file to read
         reader = csv.DictReader(csvfile)
+        # Pass reader via render_template
         return render_template("sheet.html", reader=reader)
+    # If file doesn't exist show error.html with a error message
     return render_template("error.html", message="CSV file doesn't exist!")
