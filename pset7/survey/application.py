@@ -1,5 +1,6 @@
 # import cs50
 import csv
+import os.path
 
 from flask import Flask, jsonify, redirect, render_template, request
 
@@ -41,18 +42,28 @@ def post_form():
     # Input validation for form inputs
     if not name or not group or not gender or not phone:
         return render_template("error.html", message="Please provide all required information")
+
+    # Check if the file already exists
+    file_exists = os.path.isfile('survey.csv')
     
     # Save from info into csv file
     with open('survey.csv', 'a', newline='') as csvfile:
-        fieldnames = ['user_name', 'blood_group', 'user_gender', 'user_phone']
+        fieldnames = ['Name', 'Blood Group', 'Gender', 'Phone']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        #writer.writeheader()
-        writer.writerow({'user_name': name, 'blood_group': group, 'user_gender': gender, 'user_phone': phone})
+        # Write header if the file doesn't exist
+        if not file_exists:
+            writer.writeheader()
 
-    return render_template("success.html")
+        writer.writerow({'Name': name, 'Blood Group': group, 'Gender': gender, 'Phone': phone})
+
+    # Redirect to sheet route
+    return redirect('/sheet')
 
 
 @app.route("/sheet", methods=["GET"])
 def get_sheet():
-    return render_template("error.html", message="TODO")
+    with open('survey.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        return render_template("sheet.html", reader=reader)
+    return render_template("error.html", message="CSV file doesn't exist!")
