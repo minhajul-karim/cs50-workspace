@@ -198,4 +198,8 @@ dmypy.json
 pyvenv.cfg
 pip-selfcheck.json
 
+# API key
+API_KEY.txt
+test.py
+
 # End of https://www.gitignore.io/api/venv,flask,python

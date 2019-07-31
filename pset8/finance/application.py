@@ -136,34 +136,42 @@ def register():
         # Get username and password
         user_name = request.form.get("username")
         user_password = request.form.get("password")
+        user_password_confirmation = request.form.get("confirmation")
 
         # Ensure username was submitted
         if not user_name:
-            return apology("must provide username", 403)
+            return apology("Must provide username", 403)
+
+        # Ensure is username is more than 3 characters
+        if not len(user_name) > 2:
+            return apology("username must be more than 2 characters!", 403)            
 
         # Ensure password was submitted
         elif not user_password:
-            return apology("must provide password", 403)
+            return apology("Must provide password", 403)
 
          # Ensure password confirmation was submitted
-        elif not request.form.get("confirmation"):
-            return apology("must provide password again", 403)
+        elif not user_password_confirmation:
+            return apology("Must provide password again", 403)
 
-        # Query database for newly created username
-        users = db.execute("SELECT * FROM users WHERE username = :username",
-                          username=user_name)
+        # Check both passwords
+        if user_password != user_password_confirmation:
+            return apology("Passwords mismatched!", 403)
 
-        # Check if username already exists
-        for user in users:
-            if user in users:
-                return apology("Username is not available", 403)
+        # Check if username alrady exists
+        users = db.execute("SELECT id FROM users where username = :username LIMIT 1",
+                            username=user_name)
+
+        # If users is empty
+        if users:
+            return apology("Not available!", 403)         
 
         # Insert data into database
-        db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)",
+        new_user = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)",
               username=user_name, hash=generate_password_hash(user_password))
 
-        # Remember which user has just registered
-        session["user_id"] = users[0]["id"]
+        # Save the session for new user to log him/her in right away
+        session["user_id"] = new_user
 
         # Redirect user to home page
         return redirect("/")
@@ -171,10 +179,24 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
+# Route for username avalablitiy check
+@app.route("/checkusername", methods=["POST"])
+def checkusername():
+
+    # Grab the name from data of ajax call
+    name = request.form.get("name")
     
+    # Query db for name
+    users = db.execute("SELECT id FROM users where username = :username LIMIT 1",
+                            username=name)
 
-    # return apology("TODO")
-
+    # If users is not empty
+    if users:
+        return "not_available"
+    # users is empty
+    else:
+        return "available"
 
 
 @app.route("/sell", methods=["GET", "POST"])
