@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 from helpers import apology, login_required, lookup, usd
 
@@ -44,15 +45,129 @@ if not os.environ.get("API_KEY"):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return "You are logged in!"
-    # return apology("TODO")
+
+    # Grab user id from session
+    session_user_id = session["user_id"]
+
+    # Fetch data form db
+    rows = db.execute("SELECT * FROM transactions WHERE userid = :userid GROUP BY symbol", 
+        userid=session_user_id)
+    grand_total = 0
+    
+    # Travarse all rows for logged in user
+    for row in rows:
+
+        # Get the symbol from db
+    	symbol = row["symbol"]
+
+        # Get information for symbol
+    	info = lookup(symbol)
+
+        # Total value of each holding
+    	per_stock_total = row["shares"] * info["price"]
+
+        # Calculate total spent money
+    	grand_total += per_stock_total
+
+        # Insert required indices into row to display in template
+    	row["name"] = info["name"]
+    	row["price"] = usd(info["price"])
+    	row["total"] = usd(per_stock_total)
+
+
+    # Check user's available balance
+    cash_row = db.execute("SELECT cash FROM users WHERE id = :id", id=session_user_id)
+    current_cash = cash_row[0]["cash"]
+    grand_total += current_cash
+
+    # Render index template
+    return render_template("index.html", rows=rows, current_cash=usd(current_cash), grand_total=usd(grand_total))
 
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    
+    # When user submits form
+    if request.method == "POST":
+
+        # Check for empty symbol
+        if request.form.get("symbol") == "":
+            return apology("missing symbol", 400)
+
+        # Check for empty shares
+        elif request.form.get("shares") == "":
+            return apology("missing shares", 400)
+
+        # Get data for given symbol
+        info = lookup(request.form.get("symbol"))
+        
+        # Data available
+        if info:
+
+            # Get the logged in user id
+            session_user_id = session["user_id"]
+
+            # Calculate new cost
+            new_cost = int(request.form.get("shares"))*float(info["price"])
+
+            # Check user's available balance
+            cash_row = db.execute("SELECT cash FROM users WHERE id = :id", id=session_user_id)
+            current_balance = cash_row[0]["cash"]
+
+            # Check user's affordability
+            if new_cost > current_balance:
+                return apology("not enough cash", 400)
+
+            # Get transaction time
+            current_time = (datetime.now()).replace(microsecond=0)
+
+            # Check if user has purchased stock before
+            symbol_row = db.execute("SELECT * FROM transactions WHERE userid = :userid AND symbol = :symbol",
+            	userid=session_user_id, symbol=info["symbol"])
+
+            # Update shares if user has already purchased a stock before
+            if symbol_row:
+
+            	# Get the current number of shares
+            	current_shares = int(symbol_row[0]["shares"])
+
+            	# Calculate updated shares
+            	updated_shares = current_shares + int(request.form.get("shares"))
+
+            	# Update database
+            	db.execute("UPDATE transactions SET shares = :shares WHERE userid = :userid AND symbol = :symbol",
+            		shares=updated_shares, userid=session_user_id, symbol=info["symbol"])
+
+            	# Calculate new cash
+            	updated_cash = current_balance - new_cost
+
+            	# Update database
+            	db.execute("UPDATE users SET cash = :cash WHERE id = :id", cash=updated_cash, id=session_user_id)
+            
+            # Insert data into transactions table
+            else:
+	            
+            	# Insert data into database
+	            db.execute("INSERT INTO transactions (userid, symbol, shares) VALUES (:userid, :symbol, :shares)",
+	              userid=session_user_id, symbol=info["symbol"], shares=request.form.get("shares"))
+
+	            # Calculate post purchase balance
+	            updated_balance = current_balance - new_cost
+
+	            # Update cash of users table
+	            db.execute("UPDATE users SET cash = :cash WHERE id = :id", cash=updated_balance, id=session_user_id)
+
+        
+        # Notify user for invalid symbol
+        else:
+            return apology("invalid symbol", 400)
+
+        # Redirect to homepage
+        return redirect("/")
+        
+    return render_template("buy.html")
 
 
 @app.route("/check", methods=["GET"])
@@ -119,15 +234,36 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
+
     """Get stock quote."""
-    return apology("TODO")
+    if request.method == "POST":
+        symbol = request.form.get("symbol")
+        
+        # Check for empty symbol
+        if symbol == "":
+            return apology("missing symbol", 400)
+        
+        # Get information for given symbol
+        info = lookup(symbol)
+        
+        # Show information
+        if info:
+            return render_template('quoted.html', info=info)    
+        
+        # Notify for invalid symbol
+        else:
+            return apology("invalid symbol", 400)
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
 
-    # Forget any user_id
+    """Register user"""
+    # Clear any previous session
     session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
