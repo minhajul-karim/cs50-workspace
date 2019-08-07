@@ -170,10 +170,24 @@ def buy():
     return render_template("buy.html")
 
 
-@app.route("/check", methods=["GET"])
+@app.route("/check", methods=["GET", "POST"])
 def check():
     """Return true if username available, else false, in JSON format"""
-    return jsonify("TODO")
+    
+    # Grab the name from data of ajax call via GET method
+    user_name = request.args.get("username")
+    
+    # Query db for username
+    user_row = db.execute("SELECT id FROM users where username = :username LIMIT 1",
+                            username=user_name)
+
+    # If username exists
+    if user_row:
+        return jsonify({"status": "true"})
+    
+    # username doesn't exist
+    else:
+        return jsonify({"status": "false"})
 
 
 @app.route("/history")
@@ -315,24 +329,6 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
-
-# Route for username avalablitiy check
-@app.route("/checkusername", methods=["POST"])
-def checkusername():
-
-    # Grab the name from data of ajax call
-    name = request.form.get("name")
-    
-    # Query db for name
-    users = db.execute("SELECT id FROM users where username = :username LIMIT 1",
-                            username=name)
-
-    # If users is not empty
-    if users:
-        return "not_available"
-    # users is empty
-    else:
-        return "available"
 
 
 @app.route("/sell", methods=["GET", "POST"])
