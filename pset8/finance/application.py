@@ -170,7 +170,7 @@ def buy():
     return render_template("buy.html")
 
 
-@app.route("/check", methods=["GET", "POST"])
+@app.route("/check", methods=["GET"])
 def check():
     """Return true if username available, else false, in JSON format"""
     
@@ -335,7 +335,58 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+
+    # Grab form data if user submits the form
+    if request.method == "POST":
+        stock = request.form.get("symbols")
+        num_of_shares = request.form.get("shares")
+
+        # Check for empty stock
+        if not stock:
+            return apology("Must provide symbol", 400)
+
+        # Check for empty shares
+        elif not num_of_shares:
+            return apology("Must provide number of shares", 400)
+
+        # Check if shares are available to sell
+        shares_row = db.execute("SELECT shares FROM transactions WHERE userid = :userid AND symbol = :symbol",
+            userid=session["user_id"], symbol=stock)
+        
+        # Restrict user from selling more shares than s/he has
+        if (int(num_of_shares) > shares_row[0]["shares"]):
+            return apology("Don't have enough shares", 400)
+
+        # Get information about this stock
+        info = lookup(stock)
+
+        # Current selling price
+        selling_price = info["price"] * int(num_of_shares)
+
+        # Update the cash in users table
+        cash_row = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])
+        updated_cash = cash_row[0]["cash"] + selling_price
+        db.execute("UPDATE users SET cash = :cash WHERE id = :id", cash=updated_cash, id=session["user_id"])
+
+        # DELETE row if user wills to sell all of his shares of a stock
+        if (int(request.form.get("shares")) == shares_row[0]["shares"]):
+            db.execute("DELETE FROM transactions WHERE userid = :userid AND symbol = :symbol",
+                userid=session["user_id"], symbol=request.form.get("symbols"))
+
+        # Update number of shares
+        else:
+            updated_share = shares_row[0]["shares"] - int(num_of_shares)
+            db.execute("UPDATE transactions SET shares = :shares WHERE userid = :userid",
+                shares=updated_share, userid=session["user_id"])
+
+        return redirect("/")  
+    
+    
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        # Get all the symbols a user has bought
+        symbol_rows = db.execute("SELECT symbol FROM transactions WHERE userid = :userid GROUP BY symbol", userid=session["user_id"])
+        return render_template("sell.html", symbol_rows=symbol_rows)
 
 
 def errorhandler(e):
