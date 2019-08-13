@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+    
+<div class="table-responsive">
+  <table class="table table-dark">
+    <thead>
+      <tr>
+        <th scope="col">Symbol</th>
+        <th scope="col">Name</th>
+        <th scope="col">Shares</th>
+        <th scope="col">Price</th>
+        <th scope="col">Total</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+
+    <tfoot>
+      <tr>
+        <td colspan="4"></td>
+        <td>{{ grand_total }}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td class="symbol">{{ row["symbol"] }}</td>
+          <td>{{ row["name"] }}</td>
+          <td>{{ row["shares"] }}</td>
+          <td>{{ row["price"] }}</td>
+          <td>{{ row["total"] }}</td>
+          <td>
+            <button type="button" class="btn btn-primary buy_button" name="buy_button">Buy</button>
+            <button type="button" class="btn btn-primary sell_button" name="sell_button">Sell</button>
+            <!-- <a href="/buy" class="btn btn-primary">Buy</a>
+            <a href="/sell" class="btn btn-primary">Sell</a> -->
+          </td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td>CASH</td>
+        <td colspan="3"></td>
+        <td>{{ current_cash }}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
