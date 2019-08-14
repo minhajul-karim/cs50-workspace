@@ -53,3 +53,43 @@ main img
     margin-top: .25rem;
     font-size: 80%;
 }
+
+/*Remove the span class for large display*/
+.instruction {
+    display: none;
+}
+
+.bottom_tr {
+    display: none;
+}
+
+/*Responsive Portfolio Table*/
+
+@media (max-width: 800px){
+    thead {
+        display: none;
+    }
+
+    tr {
+        border-bottom: 20px solid #FFFFFF;
+    }
+
+    td {
+        display: block;
+        widows: 100%;
+        text-align: left;
+    }
+
+    .instruction {
+        float: left;
+        display: block;
+    }
+
+    .to_be_hidden {
+        display: none;
+    }
+
+    .bottom_tr {
+        display: block;
+    }
+}

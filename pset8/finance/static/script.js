@@ -127,8 +127,8 @@ $(document).ready(function(){
     	// Grab the immediate parent of $td
     	$tr = $td.parent();
 
-    	// Grab the symbol of that <tr>
-    	$symbol = $tr.children('.symbol').text();
+    	// Grab the symbol of that row
+    	$symbol = $tr.children('.symbol_row').children('.symbol').text();
 
     	// Ajax call to send $symbol to backend 
     	$.ajax({
@@ -150,16 +150,17 @@ $(document).ready(function(){
 
     });
 
-    // When user clicks the buy button
+    // When user clicks the sell button
     $('[name="sell_button"]').on('click', function(){
+    	
     	// Grab the immediate parent of the button
     	$td = $(this).parent();
 
     	// Grab the immediate parent of $td
     	$tr = $td.parent();
 
-    	// Grab the symbol of that <tr>
-    	$symbol = $tr.children('.symbol').text();
+    	// Grab the symbol of that row
+    	$symbol = $tr.children('.symbol_row').children('.symbol').text();
     
     	// Ajax call to send $symbol to backend 
     	$.ajax({

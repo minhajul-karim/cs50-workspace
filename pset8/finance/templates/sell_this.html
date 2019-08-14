@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Quote
+    Sell
 {% endblock %}
 
 {% block main %}
-    <form id="sell_form" action="/sell" method="POST">
+    <form action="/sell" method="POST">
         <div class="form-group">
             <input type="text" class="form-control" name="symbols" value="{{ selected }}">
         </div>

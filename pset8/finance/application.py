@@ -371,7 +371,7 @@ def sell():
             userid=session["user_id"], symbol=request.form.get("symbols"))
         
         # Restrict user from selling more shares than s/he has
-        if (int(request.form.get("shares")) > shares_row[0]["shares"]):
+        if int(request.form.get("shares")) > shares_row[0]["shares"]:
             return apology("Don't have enough shares", 400)
 
         # Get information about this stock
@@ -409,7 +409,6 @@ def sell():
     
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        # Get all the symbols a user has bought
         symbol_rows = db.execute("SELECT symbol FROM transactions WHERE userid = :userid GROUP BY symbol", userid=session["user_id"])
         return render_template("sell.html", symbol_rows=symbol_rows)
 
