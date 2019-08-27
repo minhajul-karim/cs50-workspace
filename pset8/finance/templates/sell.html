@@ -7,7 +7,7 @@
 {% block main %}
     <form action="/sell" method="POST">
         <div class="form-group">
-            <select class="custom-select w-25" name="symbols" id="sell_menu">
+            <select class="custom-select w-25" name="symbol" id="sell_menu">
 			  <option selected disabled>Symbol</option>
 			  {% for row in symbol_rows %}
 			  	<option>{{ row["symbol"] }}</option>

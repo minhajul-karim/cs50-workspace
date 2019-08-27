@@ -1,185 +1,227 @@
+// When the page is loaded
 
-$(document).ready(function(){
+$(document).ready(function() {
 
-	// Form submission status, 0 = false; 1 = true
-	$submission_status = 0;
+    $name = "";
 
-	// Global var to store user provided passwords
-	$pwd1 = "";
-	$pwd2 = "";
-	
-	// When user presses a key is username field
-	$("#usr").on('keyup', function(e){
-        
-        // Declare an empty string
-        $str = "";
+    // When user presses any key in username field
+    $("#usr").on("change keyup paste", function() {
+    	$name = $("#usr").val();
+    });
 
-        // Concatenate user input
-        $str += e.target.value;
-        
-        // Ajax call with str if it's len is more than 2
-        if ($str.length > 2){
-        	$.ajax({
+	/************* validation for other registration fields ***********/
+
+	$("#reg_form").validate({
+		rules: {
+			username: {
+				required: true,
+				minlength: 1
+			},
+
+			password: {
+				required: true,
+				minlength: 5,
+				uppercase: true,
+				numbers: true,
+				specialChars: true
+			},
+
+			confirmation: {
+				required: true,
+				minlength: 5,
+				equalTo: "#pwd1"
+			}
+		},
+
+		messages: {
+			username: {
+				required: "Please enter username",
+				minlength: "Username must contain at least one character"
+			},
+
+			password: {
+				required: "Please enter a password",
+				minlength: "Password must contain at least 5 characters",
+				uppercase: "Must contain uppercase",
+				numbers: "Must have a number",
+				specialChars: "Must have a special char"
+			},
+
+			confirmation: {
+				required: "Please again enter your password",
+				minlength: "Password must contain at least 5 characters",
+				equalTo: "Both passwords must match"
+			}
+		},
+
+		submitHandler: function(form) {
+
+			$.ajax({
+
+				dataType: "json",
+				url: '/check',
 	        	data: {
-	        		username: $str
-        		},
+	        		username: $name
+	    		},
 
-        		type: 'GET',
-        		url: '/check',
+	    		type: 'GET',
 
-        		// If ajax call ends successfully
-	        	success: function(data){
+	    		// If ajax call ends successfully
+	        	success: function(data) {
 
-	        		// Check returned data
-	        		if (data.status == 'true'){
-	        			
-	        			// Notify user
-	        			$('#username_avalability').html('username is not avalaible');
-	        			$('#username_avalability').css({'color': '#dc3545'});
+	        		if (data) {
 
-	        			// Set submission_status to 0 so that the form can't be submitted 
-	        			$submission_status = 0;
-
+	        			// Notify user that username is available
+	        			$("#availability").html("Username avaialable").addClass("available");
+	        			$("#availability").removeClass("notAvailable");
+	        			form.submit();
 	        		}
-	        		else{
+	        		else {
 
-	        			// Notify user
-	        			$('#username_avalability').html('username is available');
-	        			$('#username_avalability').css({'color': '#008000'});
-
-	        			// Set submission_status to 1 to submit form 
-	        			$submission_status = 1;
+	        			// Notify user that username is available
+	        			$("#availability").html("Username not avaialable").addClass("notAvailable");
+	        			$("#availability").removeClass("available");
 	        		}
+	    		}
 
-	        	}
-        	});
+		    }); // ajax ends
+		}
 
-        }
-
-        // If the length of str is less than 3
-        else{
-
-        	// Notify user
-        	$('#username_avalability').html('username must be more than 2 characters');
-        	$('#username_avalability').css({'color': '#dc3545'});
-
-        	// Set submission_status to 0 so that the form can't be submitted 
-        	$submission_status = 0;
-        }
-
-    });
-
-    // Grab the first password
-    $('#pwd1').on('keyup', function(e){
-	    $pwd1 = "";
-
-	    // Concatenate user's 1st password
-	    $pwd1 += e.target.value;
-
-	    // Hide password mismatched error message if correction is going on
-	    $('#password_check').html('');
 	});
 
-	// Grab the confirmation password
-    $('#pwd2').on('keyup', function(e){
-	    $pwd2 = "";
+	/***** Add new methods to registration from validation *******/
 
-	    // Concatenate user's 2nd input
-	    $pwd2 += e.target.value;
+	// Method to check uppercase letters
+	$.validator.addMethod("uppercase", function(value) {
+		return /[A-Z]+/.test(value);
+	});
 
-	    // Hide password mismatched error message if correction is going on
-	    $('#password_check').html('');
+	// Method to check digits
+	$.validator.addMethod("numbers", function(value) {
+		return /[0-9]+/.test(value);
+	});
+
+	// Method to check special characters
+	$.validator.addMethod("specialChars", function(value) {
+		return /\W/.test(value);
 	});
 
 
-	// When user submits the registration form
-    $('#reg_form').on('submit', function(){
+	/******** Login form validation **********/
 
-    	// Restrict user from submitting when submission_status is set to 0
-    	if ($submission_status == 0)
-    		return false;
+	$("#login_form").validate({
+		rules: {
+			username: {
+				required: true
+			},
 
-    	// Submit otherwise
-    	 else{
-        
-	        // Submit if both passwords match
-	        if ($pwd1 == $pwd2)
-	            return true;
+			password: {
+				required: true
+			}
+		},
 
-	        // Restrict if passwords didn't match
-	        else{
+		messages: {
+			username: {
+				required: "Please enter your username"
+			},
 
-	        	// Nofity user
-	            $('#password_check').html('passwords didn\'t match');
-	            $('#password_check').css({'color': '#dc3545'});
-	            return false;
-	        }
-    	}
-    });
+			password: {
+				required: "Please enter your password"
+			}
+		}
 
-    // When user clicks the buy button of index page
+	});
 
-    $('[name="buy_button"]').on('click', function(){
+	/*********** Quote validation *************/
+	$("#quote_form").validate({
+		rules: {
+			symbol: {
+				required: true
+			}
+		},
 
-    	// Grab the immediate parent of the button
-    	$td = $(this).parent();
+		messages: {
+			symbol: {
+				required: "Please enter a symbol"
+			}
+		}
 
-    	// Grab the immediate parent of $td
-    	$tr = $td.parent();
+	});
 
-    	// Grab the symbol of that row
-    	$symbol = $tr.children('.symbol_row').children('.symbol').text();
 
-    	// Ajax call to send $symbol to backend 
-    	$.ajax({
+	// When user submits the registration button of index page
+	$('[name="buy_button"]').on('click', function() {
+
+		// Grab the immediate parent of the button
+		$td = $(this).parent();
+
+		// Grab the immediate parent of $td
+		$tr = $td.parent();
+
+		// Grab the symbol of that row
+		$symbol = $tr.children('.symbol_row').children('.symbol').text();
+
+		// ajax starts
+
+		$.ajax({
 		    data: {
 		        sym: $symbol
 		    },
+		    type: "GET",
+		    dataType: "json",
+		    url: "/save_symbol_in_session",
+		    success: function(data) {
+		        if (data) {
+		    		window.location.assign("/buythis");
+		    	}
+		    	else {
+		    		alert("Sorry! Something went wrong!");
+		    		window.location.assign("/");
+		    	}
+		    }
 
-		    type: 'GET',
-
-		    // Send data to this route
-		    url: '/save_symbol',
-
-		    success: function(response) {
-		    	// Redirect to this route
-		        window.location.assign('/buythis');
-		      },
-		    
 		});
 
-    });
+		// ajax ends
 
-    // When user clicks the sell button
-    $('[name="sell_button"]').on('click', function(){
-    	
-    	// Grab the immediate parent of the button
-    	$td = $(this).parent();
+	}); // click function ends
 
-    	// Grab the immediate parent of $td
-    	$tr = $td.parent();
 
-    	// Grab the symbol of that row
-    	$symbol = $tr.children('.symbol_row').children('.symbol').text();
-    
-    	// Ajax call to send $symbol to backend 
-    	$.ajax({
+	// When user clicks the sell button of index page
+	$('[name="sell_button"]').on('click', function() {
+
+		// Grab the immediate parent of the button
+		$td = $(this).parent();
+
+		// Grab the immediate parent of $td
+		$tr = $td.parent();
+
+		// Grab the symbol of that row
+		$symbol = $tr.children('.symbol_row').children('.symbol').text();
+
+		// ajax starts
+
+		$.ajax({
 		    data: {
 		        sym: $symbol
 		    },
+		    type: "GET",
+		    dataType: "json",
+		    url: "/save_symbol_in_session",
+		    success: function(data) {
+		        if (data) {
+		    		window.location.assign("/sellthis");
+		    	}
+		    	else {
+		    		alert("Sorry! Something went wrong!");
+		    		window.location.assign("/");
+		    	}
+		    }
 
-		    type: 'GET',
-
-		    // Send data to this route
-		    url: '/save_selected',
-
-		    success: function(response) {
-		    	// Redirect to this route
-		        window.location.assign('/sellthis');
-		      },
-		    
 		});
-    });
 
+		// ajax ends
 
-});
+	}); // click function ends
+
+}); // doc ends

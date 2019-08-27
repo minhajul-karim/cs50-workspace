@@ -46,21 +46,32 @@ main img
     max-width: 100%;
 }
 
-#username_avalability,
-#password_check
-{
-    width: 100%;
-    margin-top: .25rem;
-    font-size: 80%;
-}
-
-/*Remove the span class for large display*/
 .instruction {
     display: none;
 }
 
 .bottom_tr {
     display: none;
+}
+
+/*Password confirmation validation style for registration*/
+
+#reg_form label,
+#login_form label,
+#quote_form label {
+    display: block;
+    color: red;
+    font-size: 13px;
+}
+
+.available {
+    color: green;
+    font-size: 13px;
+}
+
+.notAvailable {
+    color: red;
+    font-size: 13px;
 }
 
 /*Responsive Portfolio Table*/
@@ -91,5 +102,12 @@ main img
 
     .bottom_tr {
         display: block;
+    }
+}
+
+
+@media (max-width: 460px){
+    .p-5 {
+        padding: 10px !important;
     }
 }
