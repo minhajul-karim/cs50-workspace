@@ -173,8 +173,6 @@ def buy():
             db.execute("INSERT INTO history (userid, symbol, shares, price, date_time) VALUES (:userid, :symbol, :shares, :price, :date_time)",
                 userid=session["user_id"], symbol=info["symbol"], shares=request.form.get("shares"), price=info["price"], date_time=current_time)
 
-
-
         # Notify user for invalid symbol
         else:
             return apology("invalid symbol", 400)
@@ -443,6 +441,8 @@ def save_symbol_in_session():
 
     # Grab the symbol form a row
     symbol = request.args.get("sym")
+
+    # Return true if the symbol is received successfully, else return false
     if symbol:
         session["symbol"] = symbol
         return jsonify(True)
@@ -463,7 +463,7 @@ def sellthis():
 
 def errorhandler(e):
     """Handle error"""
-    
+
     if not isinstance(e, HTTPException):
         e = InternalServerError()
     return apology(e.name, e.code)
