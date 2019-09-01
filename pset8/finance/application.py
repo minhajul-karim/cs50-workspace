@@ -84,6 +84,7 @@ def index():
     # Render index template
     return render_template("index.html", rows=rows, current_cash=current_cash, grand_total=grand_total)
 
+
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
@@ -131,7 +132,7 @@ def buy():
 
             # Check if user has purchased same stock before
             symbol_row = db.execute("SELECT * FROM transactions WHERE userid = :userid AND symbol = :symbol",
-                userid=session["user_id"], symbol=info["symbol"])
+                                    userid=session["user_id"], symbol=info["symbol"])
 
             # Update shares if user has already purchased a stock before
             if symbol_row:
@@ -144,7 +145,7 @@ def buy():
 
                 # Update database
                 db.execute("UPDATE transactions SET shares = :shares WHERE userid = :userid AND symbol = :symbol",
-                    shares=updated_shares, userid=session["user_id"], symbol=info["symbol"])
+                           shares=updated_shares, userid=session["user_id"], symbol=info["symbol"])
 
                 # Calculate new cash
                 updated_cash = current_balance - new_cost
@@ -157,7 +158,7 @@ def buy():
 
                 # Insert data into database
                 db.execute("INSERT INTO transactions (userid, symbol, shares) VALUES (:userid, :symbol, :shares)",
-                  userid=session["user_id"], symbol=info["symbol"], shares=request.form.get("shares"))
+                           userid=session["user_id"], symbol=info["symbol"], shares=request.form.get("shares"))
 
                 # Calculate post purchase balance
                 updated_balance = current_balance - new_cost
@@ -165,13 +166,12 @@ def buy():
                 # Update cash of users table
                 db.execute("UPDATE users SET cash = :cash WHERE id = :id", cash=updated_balance, id=session["user_id"])
 
-
             # Get transaction time
             current_time = (datetime.now()).replace(microsecond=0)
 
             # Update history
             db.execute("INSERT INTO history (userid, symbol, shares, price, date_time) VALUES (:userid, :symbol, :shares, :price, :date_time)",
-                userid=session["user_id"], symbol=info["symbol"], shares=request.form.get("shares"), price=info["price"], date_time=current_time)
+                       userid=session["user_id"], symbol=info["symbol"], shares=request.form.get("shares"), price=info["price"], date_time=current_time)
 
         # Notify user for invalid symbol
         else:
@@ -343,7 +343,7 @@ def register():
 
         # Check if username alrady exists
         users = db.execute("SELECT id FROM users where username = :username LIMIT 1",
-                            username=request.form.get("username"))
+                           username=request.form.get("username"))
 
         # If users is empty
         if users:
@@ -351,7 +351,7 @@ def register():
 
         # Insert data into database
         new_user = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)",
-              username=request.form.get("username"), hash=generate_password_hash(request.form.get("password")))
+                              username=request.form.get("username"), hash=generate_password_hash(request.form.get("password")))
 
         # Save user id to the sesssion
         session["user_id"] = new_user
@@ -387,7 +387,7 @@ def sell():
 
         # Number of shares of a stock
         shares_row = db.execute("SELECT shares FROM transactions WHERE userid = :userid AND symbol = :symbol",
-            userid=session["user_id"], symbol=request.form.get("symbol"))
+                                userid=session["user_id"], symbol=request.form.get("symbol"))
 
         # Restrict user from selling more shares than s/he has
         if int(request.form.get("shares")) > shares_row[0]["shares"]:
@@ -407,13 +407,13 @@ def sell():
         # DELETE row if user wills to sell all of his shares of a stock
         if (int(request.form.get("shares")) == shares_row[0]["shares"]):
             db.execute("DELETE FROM transactions WHERE userid = :userid AND symbol = :symbol",
-                userid=session["user_id"], symbol=request.form.get("symbol"))
+                       userid=session["user_id"], symbol=request.form.get("symbol"))
 
         # Update number of shares
         else:
             updated_share = shares_row[0]["shares"] - int(request.form.get("shares"))
             db.execute("UPDATE transactions SET shares = :shares WHERE userid = :userid AND symbol = :symbol",
-                shares=updated_share, userid=session["user_id"], symbol=request.form.get("symbol"))
+                       shares=updated_share, userid=session["user_id"], symbol=request.form.get("symbol"))
 
         # Get transaction time
         current_time = (datetime.now()).replace(microsecond=0)
@@ -421,7 +421,7 @@ def sell():
 
         # Update history table
         db.execute("INSERT INTO history (userid, symbol, shares, price, date_time) VALUES (:userid, :symbol, :shares, :price, :date_time)",
-            userid=session["user_id"], symbol=request.form.get("symbol"), shares=sold_shares, price=info["price"], date_time=current_time)
+                   userid=session["user_id"], symbol=request.form.get("symbol"), shares=sold_shares, price=info["price"], date_time=current_time)
 
         # Send the flash message to homepage
         flash("Congrats! You've successfully sold!")
@@ -431,7 +431,8 @@ def sell():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        symbol_rows = db.execute("SELECT symbol FROM transactions WHERE userid = :userid GROUP BY symbol", userid=session["user_id"])
+        symbol_rows = db.execute("SELECT symbol FROM transactions WHERE userid = :userid GROUP BY symbol",
+                                 userid=session["user_id"])
         return render_template("sell.html", symbol_rows=symbol_rows)
 
 
@@ -449,17 +450,20 @@ def save_symbol_in_session():
     else:
         return jsonify(False)
 
+
 @app.route("/buythis", methods=["GET"])
 def buythis():
     """Buy shares of specific stock"""
 
     return render_template("buy_this.html", symbol=session["symbol"])
 
+
 @app.route("/sellthis", methods=["GET"])
 def sellthis():
     """Sell shares of specific stock"""
 
     return render_template("sell_this.html", symbol=session["symbol"])
+
 
 def errorhandler(e):
     """Handle error"""
